@@ -1,0 +1,38 @@
+/!\ Pas de snapshots.
+
+1/ Fractionner en max 5 BDD, regrouper par direction ou par stratégie (quotas différents,...)
+Exemple : Labos-1, Labos-2 (20+20BAL), Recherche (20BAL), Administratif/Support (16BAL)
+2/ Exporter postfix en .PST, puis importer en Powershell dans Exchange.
+3/ Hiérarchiser les carnets d'adresse perso (bouton chemin) ?
+4/ Serveur > Répertoires virtuels passer de NTLM à KRB
+5/ Server > Outlook Anywhere > -Nom d'hôte -Négocier
+
+--------- HA ---------
+Soluce 1 : DNS Round Robin (bascule manuelle en supprimant le DNS du serveur en faute)
+Soluce 2 : IIS ARR
+Attention DAG latence <250ms sinon problèmes de réplication
+
+--------- Réparer une BAL ---------
+New-MailboxRepairRequest
+
+Défini le site assurant les échanges avec l'extérieur
+Set-ADSite -Identity site HubSiteEnabled $true
+/!\ Il faut dire aux autres serveurs de taper sur lui
+
+Flux de messagerie > Connecteurs de Reception > Default Frontend > étendue > adresse ip : limiter au serveur smtp en DMZ
+
+Flux de messagerie > Connecteurs d'envoi > Général > Cocher proxy
+						> FQDN : bien renseigner
+
+--------- Vérification enregistrement MX ---------
+nslookup
+> set type=mx
+> dom.nc
+
+> set type=a
+> mail.dom.nc
+
+--------- Maintencance serveurs ---------
+.\StartDagServerMaintenance -ServerName xxxx
+.\StopDagServerMaintenance -ServerName xxxx
+.\RedistributeActiveDabases
